@@ -1,0 +1,10 @@
+W:\VS2013\PageDynamc\PageDynamc\bin\PageDynamc.dll.config
+W:\VS2013\PageDynamc\PageDynamc\bin\PageDynamc.dll
+W:\VS2013\PageDynamc\PageDynamc\bin\PageDynamc.pdb
+W:\VS2013\PageDynamc\PageDynamc\bin\EntityFramework.dll
+W:\VS2013\PageDynamc\PageDynamc\bin\EntityFramework.SqlServer.dll
+W:\VS2013\PageDynamc\PageDynamc\bin\EntityFramework.xml
+W:\VS2013\PageDynamc\PageDynamc\bin\EntityFramework.SqlServer.xml
+W:\VS2013\PageDynamc\PageDynamc\obj\Debug\PageDynamc.csprojResolveAssemblyReference.cache
+W:\VS2013\PageDynamc\PageDynamc\obj\Debug\PageDynamc.dll
+W:\VS2013\PageDynamc\PageDynamc\obj\Debug\PageDynamc.pdb
