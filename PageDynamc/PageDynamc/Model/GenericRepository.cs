@@ -1,4 +1,12 @@
-﻿using System;
+/*!
+ * ABOUT:		Snippet Javascript implement OOP
+ * CREADOR: 	Jorge L. Torres A.
+ * NOTA: 		Cambiar el nombre App por el nombre que se le de al objeto en javascript
+ * METODO: 		Para implementar un nuevo método tomar como referencia código "App.prototype.NuevoMetodo"
+ * ACTUALIZADO: 24-03-2015 10:10AM
+ * CREADO:      20-03-2015 11:53PM
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -99,7 +107,7 @@ namespace GenericRepository
     /// <typeparam name="T">Instancia de Type a usar</typeparam>
     public class PageDynamic<T> : AbstractPage where T : class,IId, new()
     {
-        private Panel _Panel = new Panel();
+        private Panel _Panel = null;
         /// <summary>
         /// Instancia del Panel que será usado para crear todos los elementos de la instancia del objeto recibido
         /// </summary>
@@ -152,6 +160,20 @@ namespace GenericRepository
             else
                 TDynamic = Type.GetType(typeof(T).Namespace + "." + base.Clase);
 
+
+            _Panel = this.Controls.OfType<Panel>().FirstOrDefault();
+
+            if (_Panel == null)
+            {
+                _Panel = new System.Web.UI.WebControls.Panel() { ID = "PN" };
+                MasterPage masterPage = this.Master;
+                HtmlForm form = this.Master.Controls.OfType<System.Web.UI.HtmlControls.HtmlForm>().FirstOrDefault();
+                ContentPlaceHolder cph = form.Controls.OfType<ContentPlaceHolder>().FirstOrDefault();
+
+                cph.Controls.Add(_Panel);
+
+            }
+
             base.OnInit(e);
 
             PropertyInfo[] propiedades = TDynamic.GetProperties();
@@ -187,17 +209,17 @@ namespace GenericRepository
                         }
                         else
                             _Panel.Controls.Add(new LiteralControl("<tr class='help'><td  class='info'>" + nombre + "</td><td>"));
-                        if (nombre == "Password")
-                        {
-                            t.TextMode = TextBoxMode.Password;
-                        }
+                        //if (nombre == "Password")
+                        //{
+                        //    t.TextMode = TextBoxMode.Password;
+                        //}
                         _Panel.Controls.Add(t);
                         _Panel.Controls.Add(new LiteralControl("</td></tr>"));
                     }
                     if (tipo == "Boolean")
                     {
                         _Fields.Add(new KeyValuePair<string, string>(nombre, tipo));
-                        _Panel.Controls.Add(new LiteralControl("<tr><td>" + nombre + "</td><td>"));
+                        _Panel.Controls.Add(new LiteralControl("<tr class='help'><td  class='info'>" + nombre + "</td><td>"));
                         CheckBox t = new CheckBox() { ID = "chk" + nombre.Replace(" ", "") };
                         _Panel.Controls.Add(t);
                         _Panel.Controls.Add(new LiteralControl("</td></tr>"));
@@ -271,7 +293,12 @@ namespace GenericRepository
                     if (campo.Key == "Id")
                         _Panel.Controls.Add(new LiteralControl("<td><a href='?Id=" + (resultado != null ? resultado.ToString() : "") + "'><b class='fa fa-edit'></b></a></td>"));
                     else
-                        _Panel.Controls.Add(new LiteralControl("<td>" + (resultado != null ? resultado.ToString() : "") + "</td>"));
+                    {
+                        if (campo.Value != "Boolean")
+                            _Panel.Controls.Add(new LiteralControl("<td>" + (resultado != null ? resultado.ToString() : "") + "</td>"));
+                        else
+                            _Panel.Controls.Add(new LiteralControl("<td><input type='checkbox' " + (resultado != null ? (resultado.ToString()=="True"?"checked":"") : "") + "/></td>"));
+                    }
 
                 } _Panel.Controls.Add(new LiteralControl("</tr>"));
             }
@@ -304,11 +331,10 @@ namespace GenericRepository
             List<CheckBox> chks = _Panel.Controls.OfType<CheckBox>().ToList();
             foreach (CheckBox chk in chks)
             {
-              
-                    KeyValuePair<string, string> par = Fields.Where(x => x.Key == chk.ID.Replace("chk", "")).FirstOrDefault();
+
+                KeyValuePair<string, string> par = Fields.Where(x => x.Key == chk.ID.Replace("chk", "")).FirstOrDefault();
                     Type.GetType("System." + par.Value);
-                    _.GetType().GetProperty(par.Key).SetValue(_, Convert.ChangeType(chk.Checked, Type.GetType("System." + par.Value)), null);
-                
+                    _.GetType().GetProperty(par.Key).SetValue(_, chk.Checked, null);               
             }
             return _;
         }
@@ -348,12 +374,13 @@ namespace GenericRepository
                     {
                         if (control.ID == "txt" + campo.Key)
                         {
-                            object result=item.GetType().GetProperty(campo.Key).GetValue(item, null);
-                            ((TextBox)control).Text = (result!=null?result:"").ToString();
+                            object result = item.GetType().GetProperty(campo.Key).GetValue(item, null);
+                            ((TextBox)control).Text = (result != null ? result : "").ToString();
                         }
                         if (control.ID == "chk" + campo.Key)
                         {
-                            ((CheckBox)control).Checked = Convert.ToBoolean(item.GetType().GetProperty(campo.Key).GetValue(item, null));
+                            object result = item.GetType().GetProperty(campo.Key).GetValue(item, null);
+                            ((CheckBox)control).Checked = (Boolean)result;
                         }
                     }
                 }
@@ -380,7 +407,7 @@ namespace GenericRepository
             {
                 lblEstatus.Text = _Resultado;
                 Limpiar(sender, e);
-                
+
             }
         }
         protected virtual void Modificar(object sender, EventArgs e)
@@ -395,7 +422,7 @@ namespace GenericRepository
             {
                 lblEstatus.Text = _Resultado;
                 Limpiar(sender, e);
-                
+
             }
         }
         protected virtual void Eliminar(object sender, EventArgs e)
@@ -411,7 +438,7 @@ namespace GenericRepository
             {
                 lblEstatus.Text = _Resultado;
                 Limpiar(sender, e);
-                
+
             }
         }
         protected virtual void Limpiar(object sender, EventArgs e)
@@ -435,16 +462,16 @@ namespace GenericRepository
                 }
             }
             RefreshListado();
-            Button btn=((Button)sender);
+            Button btn = ((Button)sender);
             if (btn.Text == "Limpiar" || btn.Text == "Eliminar")
             {
                 Response.Redirect(Request.Url.LocalPath, false);
             }
-            else {
+            else
+            {
                 Response.Redirect(Request.Url.AbsoluteUri, false);
             }
         }
-
     }
 
     public class Utils
@@ -763,7 +790,7 @@ namespace GenericRepository
             {
                 return model.CreateQuery<T>(GetEntitySetName<T>());
             }
-            
+
         }
         public interface IPropiedades
         {
@@ -950,7 +977,7 @@ namespace GenericRepository
             /// Retorna objeto solicitado por su Id
             /// </summary>
             /// <typeparam name="T">Type de la clase solicitada</typeparam>
-            /// <param name="id">Id del objeto a consultar, el cual debe implementar la interfaz EntityFramework.EF5.IId</param>
+            /// <param name="id">Id del objeto a consultar, el cual debe implementar la interfaz GenericRepository.EF5.IId</param>
             /// <returns>Returna instancia del objeto del tipo T</returns>
             public virtual T Obtener<T>(int id) where T : class,IId
             {
